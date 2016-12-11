@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="src/csc455/group4/drthl/reflections-0.9.10.jar"/>
+	<classpathentry kind="lib" path="src/csc455/group4/drthl/annotations-2.0.1.jar"/>
+	<classpathentry kind="lib" path="src/csc455/group4/drthl/guava-18.0.jar"/>
+	<classpathentry kind="lib" path="src/csc455/group4/drthl/javassist-3.18.2-GA.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
