@@ -1,5 +1,6 @@
 package csc455.group4.drthl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -18,6 +19,25 @@ public class DRTHLProbabilityList {
 		for(String className:nonTestClasses){
 			String testClass = testClasses.get(className);
 			//initializeDRTHLClasses with probabilities of 1/# of test cases
+			DRTHLClass newDRTHLClass = new DRTHLClass(className, 1.0/nonTestClasses.size(), testClass);
+			Object testClassObject = null;
+			try {
+				testClassObject = Class.forName(testClass).newInstance();
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				System.exit(1);
+				e.printStackTrace();
+			}
+			ArrayList<String> dependencyList = null;
+			try {
+				dependencyList = (ArrayList<String>) testClassObject.getClass().getDeclaredMethod("getTestedClassDependencies").invoke(testClassObject);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+					| NoSuchMethodException | SecurityException e) {
+				System.exit(1);
+				e.printStackTrace();
+			}
+			
+			newDRTHLClass.populateAllDependencies(dependencyList);
 			probabilityList.put(className, new DRTHLClass(className, 1.0/nonTestClasses.size(), testClass));
 		}
 		rng = new Random();
@@ -71,7 +91,5 @@ public class DRTHLProbabilityList {
 		}
 	}
 	
-	private void populateAllDependencies(){
-		//TODO: Populate each TRTHLClass's dependencies
-	}
+
 }

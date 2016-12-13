@@ -48,4 +48,8 @@ public class DRTHLClass {
 	public ArrayList<String> getDependencies(){
 		return dependencies;
 	}
+	
+	public void populateAllDependencies(ArrayList<String> dependencyList){
+		dependencies = dependencyList;
+	}
 }
