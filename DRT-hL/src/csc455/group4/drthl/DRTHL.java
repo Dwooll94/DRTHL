@@ -17,6 +17,7 @@ import org.reflections.util.FilterBuilder;
 
 public class DRTHL {
 	String packageString;
+	public static boolean lToggle = true; //True: Linked on, False: Linked off.
 	public DRTHL(String packageName){
 		packageString = packageName;
 		//get all classes using open source java reflections
