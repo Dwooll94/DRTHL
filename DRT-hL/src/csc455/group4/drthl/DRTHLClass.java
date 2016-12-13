@@ -7,6 +7,7 @@ public class DRTHLClass {
 	private double probability;
 	String test;
 	ArrayList<String> dependencies;
+	private static boolean lToggle = true;
 	
 	public DRTHLClass(String className, double initialProbability, String testClass){
 		name = className;

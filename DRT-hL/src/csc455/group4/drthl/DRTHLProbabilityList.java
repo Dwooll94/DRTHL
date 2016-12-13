@@ -18,26 +18,28 @@ public class DRTHLProbabilityList {
 		maxDependencyLevels = maxLevelsOfDependency; //number of levels deep to go when updating probabilities based on dependencies.
 		for(String className:nonTestClasses){
 			String testClass = testClasses.get(className);
-			//initializeDRTHLClasses with probabilities of 1/# of test cases
-			DRTHLClass newDRTHLClass = new DRTHLClass(className, 1.0/nonTestClasses.size(), testClass);
-			Object testClassObject = null;
-			try {
-				testClassObject = Class.forName(testClass).newInstance();
-			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				System.exit(1);
-				e.printStackTrace();
+			if (DRTHL.lToggle) {
+				//initializeDRTHLClasses with probabilities of 1/# of test cases
+				DRTHLClass newDRTHLClass = new DRTHLClass(className, 1.0 / nonTestClasses.size(), testClass);
+				Object testClassObject = null;
+				try {
+					testClassObject = Class.forName(testClass).newInstance();
+				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					System.exit(1);
+					e.printStackTrace();
+				}
+				ArrayList<String> dependencyList = null;
+				try {
+					dependencyList = (ArrayList<String>) testClassObject.getClass()
+							.getDeclaredMethod("getTestedClassDependencies").invoke(testClassObject);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+						| NoSuchMethodException | SecurityException e) {
+					System.exit(1);
+					e.printStackTrace();
+				}
+				newDRTHLClass.populateAllDependencies(dependencyList);
 			}
-			ArrayList<String> dependencyList = null;
-			try {
-				dependencyList = (ArrayList<String>) testClassObject.getClass().getDeclaredMethod("getTestedClassDependencies").invoke(testClassObject);
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
-					| NoSuchMethodException | SecurityException e) {
-				System.exit(1);
-				e.printStackTrace();
-			}
-			
-			newDRTHLClass.populateAllDependencies(dependencyList);
 			probabilityList.put(className, new DRTHLClass(className, 1.0/nonTestClasses.size(), testClass));
 		}
 		rng = new Random();
