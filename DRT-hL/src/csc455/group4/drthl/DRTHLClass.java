@@ -7,7 +7,7 @@ public class DRTHLClass {
 	private double probability;
 	String test;
 	ArrayList<String> dependencies;
-	private static boolean lToggle = true;
+	
 	
 	public DRTHLClass(String className, double initialProbability, String testClass){
 		name = className;
@@ -15,32 +15,49 @@ public class DRTHLClass {
 		test = testClass;
 	}
 	
-	public Class<? extends DRTHLTestClass> getTestClass(){
-		Class<? extends DRTHLTestClass> testClass = null;
-		try {
-			
-			testClass =  (Class<? extends DRTHLTestClass>) Class.forName(test);
-			
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		return testClass;
+	public String getTestClass(){
+		return test;
 	}
 	
 	public double getProbability(){
 		return probability;
 	}
 	
-	public double increaseProbability(int dependencyLevel, double changeRate){
-		probability += changeRate/dependencyLevel;
-		return changeRate/dependencyLevel;
+	public void manyErrorsIncrease(double remainingProbabilityDomain){
+		probability = remainingProbabilityDomain;
+		
 	}
 	
-	public void decreaseProbability(double decreaseAmount){
-		probability -= decreaseAmount;
+	public double manyErrorsDecrease(int dependencyLevel, double changeRate,int maxDependencyLevels, int numberOfClasses){
+		double decreaseAmount = 0;
+		if(probability > ((changeRate * 1/dependencyLevel) /(numberOfClasses-1))){
+			decreaseAmount = probability - ((changeRate * 1/dependencyLevel) /(numberOfClasses-1));
+			probability = decreaseAmount;
+		}
+		else{
+			decreaseAmount = probability;
+			probability = 0;
+		}
+		return decreaseAmount;
 	}
-	
+	public void noErrorsIncrease(double changeRate, int numberOfClasses, double probabilityi){
+		if(probability >= changeRate){
+			probability = probability + (changeRate/(numberOfClasses-1));
+		}
+		else{
+			probability = probability - (probabilityi/(numberOfClasses-1));
+		}
+		probability = probability + (changeRate/(numberOfClasses-1));
+	}
+	public void noErrorsDecrease(double changeRate, int numberOfClasses){
+		if(probability >  (changeRate/(numberOfClasses-1))){
+			probability = probability - (changeRate/(numberOfClasses-1));
+		}
+		else{
+			probability = 0;
+		}
+		
+	}
 	
 	public void addDependency(String dependency){
 		dependencies.add(dependency);

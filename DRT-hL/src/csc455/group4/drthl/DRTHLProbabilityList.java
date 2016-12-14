@@ -12,7 +12,6 @@ public class DRTHLProbabilityList {
 	double changeRate;
 	int maxDependencyLevels;
 	Random rng ;
-	
 	public DRTHLProbabilityList(ArrayList<String> nonTestClasses,Hashtable<String, String> testClasses, double speedOfChange, int maxLevelsOfDependency){
 		changeRate = speedOfChange;
 		maxDependencyLevels = maxLevelsOfDependency; //number of levels deep to go when updating probabilities based on dependencies.
@@ -47,7 +46,7 @@ public class DRTHLProbabilityList {
 
 	}
 	
-	public Class selectTest(){
+	public String selectTest(){
 		double randomNumber = rng.nextDouble();
 		double runningCount = 0;
 		Enumeration<String> keys = probabilityList.keys();
@@ -63,33 +62,43 @@ public class DRTHLProbabilityList {
 		return null;
 	}
 	
-	public void increaseProbabilities(String basisClass){
+	public void manyErrorsEvent(String basisClass){
 		//increases the basis class probability and dependencies up to maxDependencyLevels deep
-		double totalIncrease = 0;
 		int dependencyLevel = 1;
-		totalIncrease += probabilityList.get(basisClass).increaseProbability(dependencyLevel, changeRate);
+		Enumeration<String> listKeys = probabilityList.keys();
 		ArrayList<String> currentLevel = new ArrayList<String>();
+		currentLevel.add(basisClass);
 		ArrayList<String> nextLevel = new ArrayList<String>();
 		currentLevel = probabilityList.get(basisClass).getDependencies();
 		while(dependencyLevel < maxDependencyLevels){
-			//increment current level probabilities
-			for(String classString:currentLevel){
-				nextLevel.clear();
-				totalIncrease += probabilityList.get(classString).increaseProbability(dependencyLevel, changeRate);
-				ArrayList<String> dependencyList = probabilityList.get(classString).getDependencies();
-				for(String dependency:dependencyList){
-					if(!nextLevel.contains(dependency)){
-						nextLevel.add(dependency);
+			for(String curCl:currentLevel){
+				String currentKey = null;
+				DRTHLClass currentClass =null;
+				double totalDecrease = 0;
+				while(listKeys.hasMoreElements()){
+					currentKey = listKeys.nextElement();
+					currentClass = probabilityList.get(currentKey);
+					if(currentKey != curCl){
+						totalDecrease += currentClass.manyErrorsDecrease(dependencyLevel, dependencyLevel, dependencyLevel, probabilityList.size());
 					}
 				}
+				probabilityList.get(curCl).manyErrorsIncrease(totalDecrease);
 			}
+			
 			dependencyLevel++;
 			currentLevel = nextLevel;
 		}
-		//disperse the total increase over all the classes to keep the total probability at 1.
-		Enumeration<String> keys =probabilityList.keys();
+	}
+	
+	public void fewErrorsEvent(String basisClass){
+		probabilityList.get(basisClass).noErrorsDecrease(changeRate*.3, probabilityList.size());
+		Enumeration<String> keys = probabilityList.keys();
+		String currentKey = null;
 		while(keys.hasMoreElements()){
-			probabilityList.get(keys.nextElement()).decreaseProbability(totalIncrease / probabilityList.size());
+			currentKey = keys.nextElement();
+			if(currentKey != basisClass){
+				probabilityList.get(currentKey).noErrorsIncrease(changeRate*.3,probabilityList.size(), probabilityList.get(basisClass).getProbability());
+			}
 		}
 	}
 	
