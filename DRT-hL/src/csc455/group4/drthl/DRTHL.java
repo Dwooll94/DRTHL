@@ -17,6 +17,7 @@ import org.reflections.util.FilterBuilder;
 
 public class DRTHL {
 	String packageString;
+	private DRTHLProbabilityList probList;
 	public static boolean lToggle = true; //True: Linked on, False: Linked off.
 	public DRTHL(String packageName){
 		packageString = packageName;
@@ -81,10 +82,50 @@ public class DRTHL {
 		}
 		
 		//generate the probability matrix
-		DRTHLProbabilityList probList = new DRTHLProbabilityList(classList, tests, 0.001, 3);
+		probList = new DRTHLProbabilityList(classList, tests, 0.001, 3);
 		
 	}
-	public static void run(){
-
+	public void run(int iterations){
+			for(int i = 0; i < iterations; i++){
+				String test = probList.selectTest();
+				Class testClass = null;
+				try {
+					testClass = Class.forName(test);
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					System.exit(1);
+					e1.printStackTrace();
+				}
+				Object testInstance = null;
+				try {
+					testInstance = testClass.newInstance();
+				} catch (InstantiationException | IllegalAccessException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				try {
+					testClass.getDeclaredMethod("randomTest").invoke(testInstance);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+						| NoSuchMethodException | SecurityException e) {
+					// TODO Auto-generated catch block
+					System.exit(1);
+					e.printStackTrace();
+				}
+				Double recentErrorRate = 0.0;
+				try {
+					recentErrorRate = (Double) testClass.getDeclaredMethod("getRecentErrorRate").invoke(testInstance);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+						| NoSuchMethodException | SecurityException e) {
+					// TODO Auto-generated catch block
+					System.exit(1);
+					e.printStackTrace();
+				}
+				if(recentErrorRate > 0.1){
+					probList.manyErrorsEvent(test);
+				}
+				else{
+					probList.fewErrorsEvent(test);
+				}
+			}
 	}
 }

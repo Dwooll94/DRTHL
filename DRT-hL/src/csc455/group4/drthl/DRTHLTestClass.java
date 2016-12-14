@@ -13,4 +13,6 @@ public abstract class DRTHLTestClass extends TestCase{
 	public abstract String getClassBeingTested();
 	
 	public abstract ArrayList<String> getTestedClassDependencies();
+	
+	public abstract double getRecentErrorRate();
 }
