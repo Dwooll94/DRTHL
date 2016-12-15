@@ -2,9 +2,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class MainTest extends DRTHLTestClass {
-    int MAX_RESULTS = 10;
-
-    LinkedList<Boolean> results = new LinkedList<>();
 
     @Override
     public void randomTest() {
@@ -28,23 +25,5 @@ public class MainTest extends DRTHLTestClass {
         dependencies.add("SettingsPrinter");
         dependencies.add("SettingsReader");
         return dependencies;
-    }
-
-    @Override
-    public double getRecentErrorRate() {
-        int pass = 0;
-        for (int i = 0; i < MAX_RESULTS; i++) {
-            if (results.get(i)){
-                pass++;
-            }
-        }
-        return (double) pass / (double) results.size();
-    }
-
-    private void addResult(boolean result){
-        results.add(Boolean.valueOf(result));
-        if (results.size() > MAX_RESULTS) {
-            results.remove(0);
-        }
     }
 }
