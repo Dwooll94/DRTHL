@@ -1,3 +1,5 @@
+package csc455.group4.example;
+
 class SettingsReader {
     public Settings read() {
         Settings settings = new Settings();

@@ -1,3 +1,5 @@
+package csc455.group4.example;
+
 class Settings {
     private int a, b, c;
 

@@ -1,3 +1,5 @@
+package csc455.group4.example;
+
 class SettingsPrinter {
     public void print(Settings settings) throws Exception {
         System.out.println(settings.getA());
