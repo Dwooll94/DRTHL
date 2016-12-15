@@ -1,15 +1,9 @@
 import java.util.ArrayList;
 
-public class MainTest extends DRTHLTestClass {
-
+public class SettingsTest extends DRTHLTestClass {
     @Override
     public void randomTest() {
-        try {
-            Main.main(new String[]{});
-            addResult(true);
-        } catch (Exception e) {
-            addResult(false);
-        }
+        //TODO implement this
     }
 
     @Override
@@ -20,9 +14,6 @@ public class MainTest extends DRTHLTestClass {
     @Override
     public ArrayList<String> getTestedClassDependencies() {
         ArrayList<String> dependencies = new ArrayList<>();
-        dependencies.add("Settings");
-        dependencies.add("SettingsPrinter");
-        dependencies.add("SettingsReader");
         return dependencies;
     }
 }
