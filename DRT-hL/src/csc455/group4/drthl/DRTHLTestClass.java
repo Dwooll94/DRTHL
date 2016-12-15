@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import org.junit.Test;
 import junit.framework.TestCase;
 
-public abstract class DRTHLTestClass extends TestCase {
+public abstract class DRTHLTestClass {
 
 	int MAX_RESULTS = 10;
 
@@ -34,4 +34,6 @@ public abstract class DRTHLTestClass extends TestCase {
 			results.remove(0);
 		}
 	}
+	
+	public abstract ArrayList<DRTHLErrorReport> getFailures();
 }

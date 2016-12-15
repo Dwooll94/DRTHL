@@ -8,7 +8,6 @@ public class DRTHLClass {
 	String test;
 	ArrayList<String> dependencies;
 	
-	
 	public DRTHLClass(String className, double initialProbability, String testClass){
 		name = className;
 		probability = initialProbability;
@@ -30,9 +29,9 @@ public class DRTHLClass {
 	
 	public double manyErrorsDecrease(int dependencyLevel, double changeRate,int maxDependencyLevels, int numberOfClasses){
 		double decreaseAmount = 0;
-		if(probability > ((changeRate * 1/dependencyLevel) /(numberOfClasses-1))){
-			decreaseAmount = probability - ((changeRate * 1/dependencyLevel) /(numberOfClasses-1));
-			probability = decreaseAmount;
+		if(probability > (changeRate * ((1/dependencyLevel) /(numberOfClasses-1)))){
+			decreaseAmount =(changeRate * ((1/dependencyLevel) /(numberOfClasses-1)));
+			probability = probability - decreaseAmount;
 		}
 		else{
 			decreaseAmount = probability;
@@ -45,13 +44,12 @@ public class DRTHLClass {
 			probability = probability + (changeRate/(numberOfClasses-1));
 		}
 		else{
-			probability = probability - (probabilityi/(numberOfClasses-1));
+			probability = probability + (probabilityi/(numberOfClasses-1));
 		}
-		probability = probability + (changeRate/(numberOfClasses-1));
 	}
 	public void noErrorsDecrease(double changeRate, int numberOfClasses){
-		if(probability >  (changeRate/(numberOfClasses-1))){
-			probability = probability - (changeRate/(numberOfClasses-1));
+		if(probability > changeRate){
+			probability = probability - (changeRate);
 		}
 		else{
 			probability = 0;

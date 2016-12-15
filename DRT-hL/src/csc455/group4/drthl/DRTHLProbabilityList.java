@@ -13,35 +13,36 @@ public class DRTHLProbabilityList {
 	int maxDependencyLevels;
 	Random rng ;
 	public DRTHLProbabilityList(ArrayList<String> nonTestClasses,Hashtable<String, String> testClasses, double speedOfChange, int maxLevelsOfDependency){
+		probabilityList = new Hashtable<String, DRTHLClass>();
 		changeRate = speedOfChange;
 		maxDependencyLevels = maxLevelsOfDependency; //number of levels deep to go when updating probabilities based on dependencies.
 		for(String className:nonTestClasses){
 			String testClass = testClasses.get(className);
 			if (DRTHLobject.lToggle) {
 				//initializeDRTHLClasses with probabilities of 1/# of test cases
-				DRTHLClass newDRTHLClass = new DRTHLClass(className, 1.0 / nonTestClasses.size(), testClass);
+				DRTHLClass newDRTHLClass = new DRTHLClass(className, (1.0 / (double) nonTestClasses.size()), testClass);
 				Object testClassObject = null;
 				try {
 					testClassObject = Class.forName(testClass).newInstance();
-				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					System.exit(1);
+				} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NullPointerException e) {
+					System.out.println(testClass);
 					e.printStackTrace();
+					System.exit(1);
 				}
 				ArrayList<String> dependencyList = null;
 				try {
 					dependencyList = (ArrayList<String>) testClassObject.getClass()
 							.getDeclaredMethod("getTestedClassDependencies").invoke(testClassObject);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
-						| NoSuchMethodException | SecurityException e) {
-					System.exit(1);
+						| NoSuchMethodException | SecurityException e) {				
 					e.printStackTrace();
+					System.exit(1);
 				}
 				newDRTHLClass.populateAllDependencies(dependencyList);
 			}
-			probabilityList.put(className, new DRTHLClass(className, 1.0/nonTestClasses.size(), testClass));
+			probabilityList.put(className, new DRTHLClass(className, 1.0/(double) nonTestClasses.size(), testClass));
 		}
-		rng = new Random();
+		rng = new Random(System.nanoTime());
 		
 
 	}
@@ -58,7 +59,7 @@ public class DRTHLProbabilityList {
 				return probabilityList.get(key).getTestClass();
 			}
 		}
-		System.out.println("Did not select test.");
+		
 		return null;
 	}
 	
@@ -69,20 +70,32 @@ public class DRTHLProbabilityList {
 		ArrayList<String> currentLevel = new ArrayList<String>();
 		currentLevel.add(basisClass);
 		ArrayList<String> nextLevel = new ArrayList<String>();
-		currentLevel = probabilityList.get(basisClass).getDependencies();
-		while(dependencyLevel < maxDependencyLevels){
+		while(dependencyLevel < maxDependencyLevels && currentLevel.size() > 0){
+			if(dependencyLevel > 1){
+			}
 			for(String curCl:currentLevel){
 				String currentKey = null;
 				DRTHLClass currentClass =null;
-				double totalDecrease = 0;
+				double totalNotX = 0;
+				listKeys = probabilityList.keys();
 				while(listKeys.hasMoreElements()){
 					currentKey = listKeys.nextElement();
 					currentClass = probabilityList.get(currentKey);
 					if(currentKey != curCl){
-						totalDecrease += currentClass.manyErrorsDecrease(dependencyLevel, dependencyLevel, dependencyLevel, probabilityList.size());
+						currentClass.manyErrorsDecrease(dependencyLevel, changeRate , maxDependencyLevels, probabilityList.size());
+						totalNotX += currentClass.getProbability();
 					}
 				}
-				probabilityList.get(curCl).manyErrorsIncrease(totalDecrease);
+				ArrayList<String> curClDeps = probabilityList.get(curCl).getDependencies();
+				if(curClDeps != null && curClDeps.size() > 0){
+					for(String dep: curClDeps){
+						if(!nextLevel.contains(dep)){
+							nextLevel.add(dep);
+						}
+					}
+				}
+
+				probabilityList.get(curCl).manyErrorsIncrease(1.0 - totalNotX);
 			}
 			
 			dependencyLevel++;
@@ -101,6 +114,42 @@ public class DRTHLProbabilityList {
 			}
 		}
 	}
-	
+
+	public void printAllErrors(){
+		Enumeration<String> keys = probabilityList.keys();
+		String key = null;
+		ArrayList<DRTHLErrorReport> failures = new ArrayList<DRTHLErrorReport>();
+		while(keys.hasMoreElements()){
+			key = keys.nextElement();
+			Class testClass = null;
+			try {
+				testClass = Class.forName( probabilityList.get(key).getTestClass());
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Object testInstance = null;
+			try {
+				testInstance = testClass.newInstance();
+			} catch (InstantiationException | IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				failures.addAll((ArrayList<DRTHLErrorReport>)testClass.getDeclaredMethod("getFailures").invoke(testInstance));
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+					| NoSuchMethodException | SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.exit(1);
+			}
+			
+
+		}
+		for(int i = 0; i < failures.size(); i++){
+			failures.get(i).printResult();
+		}
+		System.out.println(failures.size() + " failures.");
+	}
 
 }

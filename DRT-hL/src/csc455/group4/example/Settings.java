@@ -2,6 +2,10 @@ package csc455.group4.example;
 
 class Settings {
     private int a, b, c;
+    
+    public Settings(){
+    	a= 0; b= 0; c = 0;
+    }
 
     public void setA(int x) {
         a = x;
@@ -27,11 +31,15 @@ class Settings {
         return c;
     }
 
-    public double getCalculatedConfig() throws Exception {
-
+    public double getCalculatedConfig(){
+    	
         // Bug inserted to see if unit tests can find it!
-        if (a == 10) {
-            throw new Exception("BOOM");
+        if (a == 10 || Math.abs(a) + Math.abs(b)+ Math.abs(c) > 1073741823) {
+        	System.out.println("Boom");
+        	a= 0;
+        	b= 0;
+        	c = 0;
+            
         }
 
         double aa = (double) a;

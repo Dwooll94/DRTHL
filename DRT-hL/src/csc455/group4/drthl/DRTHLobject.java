@@ -32,61 +32,62 @@ public class DRTHLobject {
 		    .setScanners(new SubTypesScanner(false /* don't exclude Object.class */), new ResourcesScanner())
 		    .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0])))
 		    .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(packageString))));
-		Set<Class<? extends Object>> classes = reflections.getSubTypesOf(Object.class);
+		Set<Class<?>> classes = reflections.getSubTypesOf(Object.class);
+		Set<Class<? extends DRTHLTestClass>> testClasses = reflections.getSubTypesOf(csc455.group4.drthl.DRTHLTestClass.class);
+		Iterator<Class<? extends DRTHLTestClass>> testIterator = testClasses.iterator();
 		//separate out ones that are tests
 		Iterator<Class<? extends Object>> classesIterator = classes.iterator();
 		Hashtable<String, String> tests = new Hashtable<String, String>();
 		ArrayList<String> classList = new ArrayList<String>();
 		while(classesIterator.hasNext()){
 			Class<? extends Object>currentClass = classesIterator.next();
-			if(currentClass.getSuperclass().getCanonicalName().equals("csc455.group4.drthl.DRTHLTestClass")){
-				Object instance = null;
-				try {
-					instance = currentClass.newInstance();
-				} catch (InstantiationException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-					System.exit(1);
-				} catch (IllegalAccessException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-					System.exit(1);
-				}
-				String classBeingTested = null;
-				try {
-					classBeingTested = (String) currentClass.getDeclaredMethod("getClassBeingTested").invoke(instance);
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					System.exit(1);
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					System.exit(1);
-				} catch (InvocationTargetException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					System.exit(1);
-				} catch (NoSuchMethodException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					System.exit(1);
-				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					System.exit(1);
-				}
-				tests.put(classBeingTested, currentClass.getCanonicalName());
-			}
-			else{
 				classList.add(currentClass.getCanonicalName());
 			}
+		while(testIterator.hasNext()){
+			Object instance = null;
+			Class<? extends DRTHLTestClass> currentClass = testIterator.next();
+			try {
+				instance = currentClass.newInstance();
+			} catch (InstantiationException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				System.exit(1);
+			} catch (IllegalAccessException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				System.exit(1);
+			}
+			String classBeingTested = null;
+			try {
+				classBeingTested = (String) currentClass.getDeclaredMethod("getClassBeingTested").invoke(instance);
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.exit(1);
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.exit(1);
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.exit(1);
+			} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.exit(1);
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				System.exit(1);
+			}
+			tests.put(classBeingTested, currentClass.getCanonicalName());
 		}
-		
 		//generate the probability matrix
 		probList = new DRTHLProbabilityList(classList, tests, 0.001, 3);
 		
 	}
+
 	public void run(int iterations){
 			for(int i = 0; i < iterations; i++){
 				String test = probList.selectTest();
@@ -108,26 +109,29 @@ public class DRTHLobject {
 				try {
 					testClass.getDeclaredMethod("randomTest").invoke(testInstance);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
-						| NoSuchMethodException | SecurityException e) {
-					// TODO Auto-generated catch block
-					System.exit(1);
+						| NoSuchMethodException | SecurityException e) {			
 					e.printStackTrace();
+					System.exit(1);
 				}
 				Double recentErrorRate = 0.0;
+				String testedClass = null;
 				try {
-					recentErrorRate = (Double) testClass.getDeclaredMethod("getRecentErrorRate").invoke(testInstance);
+					recentErrorRate = 1 - (Double) testClass.getDeclaredMethod("getRecentErrorRate").invoke(testInstance);
+					testedClass = (String)testClass.getDeclaredMethod("getClassBeingTested").invoke(testInstance);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
 						| NoSuchMethodException | SecurityException e) {
 					// TODO Auto-generated catch block
-					System.exit(1);
+		
 					e.printStackTrace();
+					System.exit(1);
 				}
 				if(recentErrorRate > 0.1){
-					probList.manyErrorsEvent(test);
+					probList.manyErrorsEvent(testedClass);
 				}
 				else{
-					probList.fewErrorsEvent(test);
+					probList.fewErrorsEvent(testedClass);
 				}
 			}
+			probList.printAllErrors();
 	}
 }
