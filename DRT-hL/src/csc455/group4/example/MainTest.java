@@ -46,7 +46,7 @@ public class MainTest extends csc455.group4.drthl.DRTHLTestClass {
         return (double) pass / (double) results.size();
     }
 
-    private void addResult(boolean result){
+    protected void addResult(boolean result){
         results.add(Boolean.valueOf(result));
         if (results.size() > MAX_RESULTS) {
             results.remove(0);
