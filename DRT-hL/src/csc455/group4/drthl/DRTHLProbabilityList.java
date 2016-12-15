@@ -17,7 +17,7 @@ public class DRTHLProbabilityList {
 		maxDependencyLevels = maxLevelsOfDependency; //number of levels deep to go when updating probabilities based on dependencies.
 		for(String className:nonTestClasses){
 			String testClass = testClasses.get(className);
-			if (DRTHL.lToggle) {
+			if (DRTHLobject.lToggle) {
 				//initializeDRTHLClasses with probabilities of 1/# of test cases
 				DRTHLClass newDRTHLClass = new DRTHLClass(className, 1.0 / nonTestClasses.size(), testClass);
 				Object testClassObject = null;

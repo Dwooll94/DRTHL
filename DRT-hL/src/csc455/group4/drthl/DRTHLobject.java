@@ -15,11 +15,13 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 
-public class DRTHL {
+public class DRTHLobject {
 	String packageString;
 	private DRTHLProbabilityList probList;
 	public static boolean lToggle = true; //True: Linked on, False: Linked off.
-	public DRTHL(String packageName){
+	
+
+	public DRTHLobject(String packageName){
 		packageString = packageName;
 		//get all classes using open source java reflections
 		List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
