@@ -32,7 +32,13 @@ public class MainTest extends DRTHLTestClass {
 
     @Override
     public double getRecentErrorRate() {
-        return 0;
+        int pass = 0;
+        for (int i = 0; i < MAX_RESULTS; i++) {
+            if (results.get(i)){
+                pass++;
+            }
+        }
+        return (double) pass / (double) results.size();
     }
 
     private void addResult(boolean result){
